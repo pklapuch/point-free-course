@@ -36,11 +36,7 @@ enum AppStateReducerComposer {
 
 extension AppState {
     var primeModalState: PrimeModalState {
-        get {
-            PrimeModalState(prime: count, favoritePrimes: favoritePrimes)
-        }
-        set {
-            favoritePrimes = newValue.favoritePrimes
-        }
+        get { PrimeModalState(prime: count, favoritePrimes: favoritePrimes) }
+        set { favoritePrimes = newValue.favoritePrimes }
     }
 }
