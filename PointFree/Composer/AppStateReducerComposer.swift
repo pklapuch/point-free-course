@@ -1,4 +1,8 @@
 import Foundation
+import ComposableArchitecture
+import FavoritePrimes
+import Counter
+import PrimeModal
 
 enum AppStateReducerComposer {
     static func reduce(
@@ -13,7 +17,7 @@ enum AppStateReducerComposer {
             ),
             pullback(
                 PrimeModalReducer.reduce,
-                value: \.self,
+                value: \.primeModalState,
                 action: \.primeModel
             ),
             pullback(
@@ -24,9 +28,19 @@ enum AppStateReducerComposer {
         )
 
         compose(reducer: appReducer, with:
-            AppStateLoggingReducer.reduce,
             LoggingReducer.reduce,
             ActivityFeedReducer.reduce
         )(&state, action)
+    }
+}
+
+extension AppState {
+    var primeModalState: PrimeModalState {
+        get {
+            PrimeModalState(prime: count, favoritePrimes: favoritePrimes)
+        }
+        set {
+            favoritePrimes = newValue.favoritePrimes
+        }
     }
 }

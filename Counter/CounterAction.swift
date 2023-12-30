@@ -1,6 +1,6 @@
 import Foundation
 
-enum CounterAction {
+public enum CounterAction {
     case decrementTapped
     case incrementTapped
 }

@@ -1,6 +1,6 @@
 import Foundation
 
-func pullback<LocalValue, GlobalValue, LocalAction, GlobalAction>(
+public func pullback<LocalValue, GlobalValue, LocalAction, GlobalAction>(
     _ reducer: @escaping (inout LocalValue, LocalAction) -> Void,
     value: WritableKeyPath<GlobalValue, LocalValue>,
     action: WritableKeyPath<GlobalAction, LocalAction?>
@@ -11,7 +11,7 @@ func pullback<LocalValue, GlobalValue, LocalAction, GlobalAction>(
     }
 }
 
-func combine<Value, Action>(
+public func combine<Value, Action>(
     _ reducers: (inout Value, Action) -> Void...
 ) -> (inout Value, Action) -> Void {
     return { value, action in
@@ -19,7 +19,7 @@ func combine<Value, Action>(
     }
 }
 
-func compose<Value, Action>(
+public func compose<Value, Action>(
     reducer: @escaping (inout Value, Action) -> Void,
     with reducers: (@escaping (inout Value, Action) -> Void) -> (inout Value, Action) -> Void...
 ) -> (inout Value, Action) -> Void {

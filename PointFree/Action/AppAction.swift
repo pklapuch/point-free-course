@@ -1,4 +1,7 @@
 import Foundation
+import FavoritePrimes
+import Counter
+import PrimeModal
 
 enum AppAction {
     case counter(CounterAction)

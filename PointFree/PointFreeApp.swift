@@ -1,11 +1,5 @@
-//
-//  PointFreeApp.swift
-//  PointFree
-//
-//  Created by Pawel Klapuch on 12/29/23.
-//
-
 import SwiftUI
+import ComposableArchitecture
 
 @main
 struct PointFreeApp: App {

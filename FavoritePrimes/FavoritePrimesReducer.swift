@@ -1,7 +1,7 @@
 import Foundation
 
-enum FavoritePrimesReducer {
-    static func reduce(
+public enum FavoritePrimesReducer {
+    public static func reduce(
         state: inout [Int],
         action: FavoritePrimesAction
     ) {

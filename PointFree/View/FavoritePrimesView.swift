@@ -1,4 +1,5 @@
 import SwiftUI
+import ComposableArchitecture
 
 struct FavoritePrimesView: View {
     @ObservedObject var store: Store<AppState, AppAction>
