@@ -62,7 +62,7 @@ struct CounterView: View {
 #Preview {
     let store = Store<AppState, AppAction>(
         initialValue: AppState(),
-        reducer: AppStateReducer.reduce
+        reducer: AppStateReducerComposer.reduce
     )
 
     return CounterView(store: store)

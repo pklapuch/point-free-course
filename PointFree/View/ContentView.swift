@@ -23,7 +23,7 @@ struct ContentView: View {
 #Preview {
     let store = Store<AppState, AppAction>(
         initialValue: AppState(),
-        reducer: AppStateReducer.reduce
+        reducer: AppStateReducerComposer.reduce
     )
 
     return ContentView(store: store)

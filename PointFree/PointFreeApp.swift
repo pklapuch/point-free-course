@@ -13,7 +13,7 @@ struct PointFreeApp: App {
         WindowGroup {
             let store = Store<AppState, AppAction>(
                 initialValue: AppState(),
-                reducer: AppStateReducer.reduce
+                reducer: AppStateReducerComposer.reduce
             )
 
             ContentView(store: store)
