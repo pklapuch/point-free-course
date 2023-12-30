@@ -1,10 +1,10 @@
 import SwiftUI
 
 struct NthPrimeAlert: View {
-    let state: AppState
+    let prime: Int
     let result: Int
 
     var body: some View {
-        Text("Nth prime of \(state.count) is: \(result)")
+        Text("Nth prime of \(prime) is: \(result)")
     }
 }
