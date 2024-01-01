@@ -11,15 +11,11 @@ enum AppStateReducerComposer {
     ) {
         let appReducer: (inout AppState, AppAction) -> Void = combine(
             pullback(
-                CounterReducer.reduce,
-                value: \.count,
-                action: \.counter
+                CounterReducer.reducer,
+                value: \.counterView,
+                action: \.counterView
             ),
-            pullback(
-                PrimeModalReducer.reduce,
-                value: \.primeModalState,
-                action: \.primeModel
-            ),
+
             pullback(
                 FavoritePrimesReducer.reduce,
                 value: \.favoritePrimes,
@@ -35,8 +31,13 @@ enum AppStateReducerComposer {
 }
 
 extension AppState {
-    var primeModalState: PrimeModalState {
-        get { PrimeModalState(prime: count, favoritePrimes: favoritePrimes) }
-        set { favoritePrimes = newValue.favoritePrimes }
+    var counterView: CounterViewState {
+        get {
+            CounterViewState(count: count, favoritePrimes: favoritePrimes)
+        }
+        set {
+            count = newValue.count
+            favoritePrimes = newValue.favoritePrimes
+        }
     }
 }

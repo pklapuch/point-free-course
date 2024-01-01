@@ -1,4 +1,7 @@
 import Foundation
+import PrimeModal
+import Counter
+import FavoritePrimes
 
 enum ActivityFeedReducer {
     static func reduce(
@@ -6,17 +9,38 @@ enum ActivityFeedReducer {
     ) -> (inout AppState, AppAction) -> Void {
         return { value, action in
             switch action {
-            case .primeModal(.removeFavoritePrimeTapped):
-                removeFavoritePrime(value: &value)
-            case .primeModal(.saveFavoritePrimeTapped): ()
-                saveFavoritePrime(value: &value)
-            case let .favoritePrimes(.removeFavoritePrimes(indexSet)):
-                removeFavoritePrimes(value: &value, indexSet: indexSet)
-            default:
-                ()
+            case let .counterView(action):
+                reduce(value: &value, action: action)
+            case let .favoritePrimes(action):
+                reduce(value: &value, action: action)
             }
 
             reducer(&value, action)
+        }
+    }
+
+    private static func reduce(value: inout AppState, action: CounterViewAction) {
+        switch action {
+        case .counter:
+            break
+        case let .primeModal(action):
+            reduce(value: &value, action: action)
+        }
+    }
+
+    private static func reduce(value: inout AppState, action: FavoritePrimesAction) {
+        switch action {
+        case let .removeFavoritePrimes(indexSet):
+            removeFavoritePrimes(value: &value, indexSet: indexSet)
+        }
+    }
+
+    private static func reduce(value: inout AppState, action: PrimeModalAction) {
+        switch action {
+        case .saveFavoritePrimeTapped:
+            saveFavoritePrime(value: &value)
+        case .removeFavoritePrimeTapped:
+            removeFavoritePrime(value: &value)
         }
     }
 
