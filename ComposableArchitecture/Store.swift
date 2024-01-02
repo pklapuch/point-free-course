@@ -15,18 +15,6 @@ public struct Effect<A> {
     }
 }
 
-public extension Effect {
-    func receive(on queue: DispatchQueue) -> Effect {
-        return Effect { callback in
-            self.run { a in
-                queue.async {
-                    callback(a)
-                }
-            }
-        }
-    }
-}
-
 public typealias Reducer<Value, Action> = (inout Value, Action) -> [Effect<Action>]
 
 public final class Store<Value, Action>: ObservableObject {
