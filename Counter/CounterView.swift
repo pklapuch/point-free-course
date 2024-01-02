@@ -3,12 +3,49 @@ import ComposableArchitecture
 import PrimeModal
 
 public struct CounterViewState {
+    public var alertNthPrime: NthPrimeAlert?
     public var count: Int
     public var favoritePrimes: [Int]
+    public var isNthPrimeButtonDisable: Bool
 
-    public init(count: Int, favoritePrimes: [Int]) {
+    public init(
+        alertNthPrime: NthPrimeAlert? = nil,
+        count: Int,
+        favoritePrimes: [Int],
+        isNthPrimeButtonDisable: Bool
+    ) {
+        self.alertNthPrime = alertNthPrime
         self.count = count
         self.favoritePrimes = favoritePrimes
+        self.isNthPrimeButtonDisable = isNthPrimeButtonDisable
+    }
+
+    var counter: CounterState {
+        get {
+            CounterState(
+                alertNthPrime: alertNthPrime,
+                count: count,
+                isNthPrimeButtonDisable: isNthPrimeButtonDisable
+            )
+        }
+        set {
+            alertNthPrime = newValue.alertNthPrime
+            count = newValue.count
+            isNthPrimeButtonDisable = newValue.isNthPrimeButtonDisable
+        }
+    }
+
+    var primeModal: PrimeModalState {
+        get {
+            PrimeModalState(
+                prime: count,
+                favoritePrimes: favoritePrimes
+            )
+        }
+        set {
+            count = newValue.prime
+            favoritePrimes = newValue.favoritePrimes
+        }
     }
 }
 
@@ -44,9 +81,6 @@ public enum CounterViewAction {
 public struct CounterView: View {
     @ObservedObject private var store: Store<CounterViewState, CounterViewAction>
     @State private var isPrimeModalShown: Bool = false
-    @State private var nthPrime: Int?
-    @State private var isNthPrimeShown: Bool = false
-    @State private var isNthPrimeButtonDisabled = false
 
     public init(store: Store<CounterViewState, CounterViewAction>) {
         self.store = store
@@ -77,7 +111,7 @@ public struct CounterView: View {
                 action: nthPrimeButtonAction,
                 label: { Text("What is the \(ordinal(store.value.count)) prime?") }
             )
-            .disabled(isNthPrimeButtonDisabled)
+            .disabled(store.value.isNthPrimeButtonDisable)
         }
         .font(.title)
         .navigationTitle("Counter Demo")
@@ -94,31 +128,22 @@ public struct CounterView: View {
                 )
             )
         })
-        .alert(
-            "Test",
-            isPresented: $isNthPrimeShown, presenting: nthPrime) { nthPrime in
-                VStack {
-                    NthPrimeAlert(prime: store.value.count, result: nthPrime)
-                    Button("OK", action: { isNthPrimeShown = false })
-                }
-        }
+        .alert("Nth Prime",
+               isPresented: .constant(store.value.alertNthPrime != nil),
+               presenting: store.value.alertNthPrime,
+               actions: { _ in
+            Button(
+                action: { store.send(.counter(.nthPrimeDismissed)) },
+                label: { Text("OK")  })
+
+        }, message: { alert in
+            Text("Primse is: \(alert.prime)")
+        })
     }
 
     func nthPrimeButtonAction() {
-        isNthPrimeButtonDisabled = true
-        getNthPrimeFromRemote(store.value.count) { result in
-            nthPrime = result
-            isNthPrimeShown = true
-            isNthPrimeButtonDisabled = false
-        }
+        self.store.send(.counter(.nthPrimeButtonTapped))
     }
-}
-
-func getNthPrimeFromRemote(_ n: Int, callback: @escaping (Int?) -> Void) {
-    DispatchQueue.global().asyncAfter(
-        deadline: .now() + 0.3,
-        execute: { callback(42) }
-    )
 }
 
 func ordinal(_ n: Int) -> String {

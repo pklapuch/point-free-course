@@ -32,11 +32,18 @@ enum AppStateReducerComposer {
 extension AppState {
     var counterView: CounterViewState {
         get {
-            CounterViewState(count: count, favoritePrimes: favoritePrimes)
+            CounterViewState(
+                alertNthPrime: alertNthPrime,
+                count: count,
+                favoritePrimes: favoritePrimes,
+                isNthPrimeButtonDisable: isNthPrimeButtonDisable
+            )
         }
         set {
+            alertNthPrime = newValue.alertNthPrime
             count = newValue.count
             favoritePrimes = newValue.favoritePrimes
+            isNthPrimeButtonDisable = newValue.isNthPrimeButtonDisable
         }
     }
 }

@@ -1,10 +1,18 @@
 import SwiftUI
 
-struct NthPrimeAlert: View {
-    let prime: Int
-    let result: Int
+public struct NthPrimeAlert: View, Identifiable {
+    public var id: String
 
-    var body: some View {
+    public let prime: Int
+    public let result: Int
+
+    public init(prime: Int, result: Int) {
+        self.prime = prime
+        self.result = result
+        self.id = UUID().uuidString
+    }
+
+    public var body: some View {
         Text("Nth prime of \(prime) is: \(result)")
     }
 }
