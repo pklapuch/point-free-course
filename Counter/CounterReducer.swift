@@ -45,15 +45,11 @@ public enum CounterReducer {
             return []
         case .nthPrimeButtonTapped:
             state.isNthPrimeButtonDisable = true
-            let count = state.count
-
-            return [Effect<CounterAction> { callback in
-                getNthPrimeFromRemote(count) { prime in
-                    DispatchQueue.main.async {
-                        callback(.nthPrimeResponse(1999))
-                    }
-                }
-            }]
+            return [
+                getNthPrimeFromRemote(state.count)
+                    .map { .nthPrimeResponse($0) }
+                    .receive(on: DispatchQueue.main)
+            ]
         case let .nthPrimeResponse(prime):
             state.nthPrime = prime.map {
                 NthPrimeState(prime: state.count, result: $0)
@@ -67,11 +63,15 @@ public enum CounterReducer {
     }
 }
 
-func getNthPrimeFromRemote(_ n: Int, callback: @escaping (Int?) -> Void) {
-    DispatchQueue.global().asyncAfter(
-        deadline: .now() + 0.3,
-        execute: { callback(42) }
-    )
+func getNthPrimeFromRemote(_ n: Int) -> Effect<Int?> {
+    return Effect { callback in
+        DispatchQueue.global().asyncAfter(
+            deadline: .now() + 0.3,
+            execute: {
+                callback(42)
+            }
+        )
+    }
 }
 
 private extension CounterViewState {
