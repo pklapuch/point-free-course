@@ -16,32 +16,44 @@ public enum FavoritePrimesReducer {
             state = primes
             return []
         case .saveButtonTapped:
-            let state = state
-            return [{
-                save(state)
-                return nil
-            }]
+            return [saveEffect(favoritePrimes: state)]
         case .loadButtonTapped:
-            return [{
-                let value = load()
-                return .loadedFavoritePrimes(value)
-            }]
+            return [loadEffect()]
         }
     }
-    
-    private static func save(_ value: [Int]) {
+
+    private static func saveEffect(
+        favoritePrimes: [Int]
+    ) -> Effect<FavoritePrimesAction> {
+        {
+            FileHelper.save(favoritePrimes)
+            return nil
+        }
+    }
+
+    private static func loadEffect(
+    ) -> Effect<FavoritePrimesAction> {
+        {
+            let favoritePrimes = FileHelper.load()
+            return .loadedFavoritePrimes(favoritePrimes)
+        }
+    }
+}
+
+enum FileHelper {
+    static func save(_ value: [Int]) {
         let data = try! JSONEncoder().encode(value)
         let url = makeFavoritePrimesUrl()
         try! data.write(to: url)
     }
 
-    private static func load() -> [Int] {
+    static func load() -> [Int] {
         let url = makeFavoritePrimesUrl()
         let data = try! Data(contentsOf: url)
         return try! JSONDecoder().decode([Int].self, from: data)
     }
 
-    private static func makeFavoritePrimesUrl() -> URL {
+    static func makeFavoritePrimesUrl() -> URL {
         let documentsPath = NSSearchPathForDirectoriesInDomains(
             .documentDirectory,
             .userDomainMask,
