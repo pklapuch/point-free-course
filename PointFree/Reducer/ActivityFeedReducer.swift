@@ -32,6 +32,8 @@ enum ActivityFeedReducer {
         switch action {
         case let .removeFavoritePrimes(indexSet):
             removeFavoritePrimes(value: &value, indexSet: indexSet)
+        case .loadedFavoritePrimes: ()
+        case .saveButtonTapped: ()
         }
     }
 
