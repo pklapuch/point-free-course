@@ -2,8 +2,8 @@ import Foundation
 
 public enum LoggingReducer {
     public static func reduce<Value, Action>(
-        _ reducer: @escaping (inout Value, Action) -> Void
-    ) -> (inout Value, Action) -> Void {
+        _ reducer: @escaping Reducer<Value, Action>
+    ) -> Reducer<Value, Action> {
         return { value, action in
             reducer(&value, action)
             print("Action: \(action)")
