@@ -8,12 +8,11 @@ public enum LoggingReducer {
             let effects = reducer(&value, action)
             let newValue = value
 
-            return [{
+            return [{ _ in
                 print("Action: \(action)")
                 print("Value:")
                 dump(newValue)
                 print("--")
-                return nil
             }] + effects
         }
     }

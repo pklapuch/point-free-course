@@ -33,14 +33,14 @@ extension AppState {
     var counterView: CounterViewState {
         get {
             CounterViewState(
-                alertNthPrime: alertNthPrime,
+                nthPrime: nthPrime,
                 count: count,
                 favoritePrimes: favoritePrimes,
                 isNthPrimeButtonDisable: isNthPrimeButtonDisable
             )
         }
         set {
-            alertNthPrime = newValue.alertNthPrime
+            nthPrime = newValue.nthPrime
             count = newValue.count
             favoritePrimes = newValue.favoritePrimes
             isNthPrimeButtonDisable = newValue.isNthPrimeButtonDisable

@@ -3,18 +3,18 @@ import ComposableArchitecture
 import PrimeModal
 
 public struct CounterViewState {
-    public var alertNthPrime: NthPrimeAlert?
+    public var nthPrime: NthPrimeState?
     public var count: Int
     public var favoritePrimes: [Int]
     public var isNthPrimeButtonDisable: Bool
 
     public init(
-        alertNthPrime: NthPrimeAlert? = nil,
+        nthPrime: NthPrimeState? = nil,
         count: Int,
         favoritePrimes: [Int],
         isNthPrimeButtonDisable: Bool
     ) {
-        self.alertNthPrime = alertNthPrime
+        self.nthPrime = nthPrime
         self.count = count
         self.favoritePrimes = favoritePrimes
         self.isNthPrimeButtonDisable = isNthPrimeButtonDisable
@@ -23,13 +23,13 @@ public struct CounterViewState {
     var counter: CounterState {
         get {
             CounterState(
-                alertNthPrime: alertNthPrime,
+                nthPrime: nthPrime,
                 count: count,
                 isNthPrimeButtonDisable: isNthPrimeButtonDisable
             )
         }
         set {
-            alertNthPrime = newValue.alertNthPrime
+            nthPrime = newValue.nthPrime
             count = newValue.count
             isNthPrimeButtonDisable = newValue.isNthPrimeButtonDisable
         }
@@ -129,15 +129,15 @@ public struct CounterView: View {
             )
         })
         .alert("Nth Prime",
-               isPresented: .constant(store.value.alertNthPrime != nil),
-               presenting: store.value.alertNthPrime,
+               isPresented: .constant(store.value.nthPrime != nil),
+               presenting: store.value.nthPrime,
                actions: { _ in
             Button(
                 action: { store.send(.counter(.nthPrimeDismissed)) },
                 label: { Text("OK")  })
 
         }, message: { alert in
-            Text("Primse is: \(alert.prime)")
+            Text("Value of \(alert.prime)th prime is: \(alert.result)")
         })
     }
 

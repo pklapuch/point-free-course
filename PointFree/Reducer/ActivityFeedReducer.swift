@@ -24,16 +24,19 @@ enum ActivityFeedReducer {
             var allEffects = [Effect<AppAction>]()
 
             allEffects.append(contentsOf: counterEffects.map { counterEffect in
-                { () -> AppAction? in
-                    guard let counterAction = counterEffect() else { return nil }
-                    return .counterView(counterAction)
+                { callback in
+                    counterEffect { localAction in
+                        callback(.counterView(localAction))
+                    }
+
                 }
             })
 
             allEffects.append(contentsOf: favoritePrimesEffects.map { primeEffect in
-                { () -> AppAction? in
-                    guard let primeAction = primeEffect() else { return nil }
-                    return .favoritePrimes(primeAction)
+                { callback in
+                    primeEffect { localAction in
+                        callback(.favoritePrimes(localAction))
+                    }
                 }
             })
 
@@ -53,10 +56,12 @@ enum ActivityFeedReducer {
             return []
         case let .primeModal(action):
             let primeModalEffects = reduce(value: &value, action: action)
-            return primeModalEffects.map { primeModelEffect in
-                { () -> CounterViewAction? in
-                    guard let primeModalAction = primeModelEffect() else { return nil }
-                    return .primeModal(primeModalAction)
+            
+            return primeModalEffects.map { primeModalEffect in
+                { callback in
+                    primeModalEffect { localAction in
+                        callback(.primeModal(localAction))
+                    }
                 }
             }
         }

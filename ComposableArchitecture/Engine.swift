@@ -13,12 +13,12 @@ public func pullback<LocalValue, GlobalValue, LocalAction, GlobalAction>(
         let localEffects = reducer(&globalValue[keyPath: value], localAction)
 
         return localEffects.map { localEffect in
-            { () -> GlobalAction? in
-                guard let localAction = localEffect() else { return nil }
-
-                var globalAction = globalAction
-                globalAction[keyPath: action] = localAction
-                return globalAction
+            { callback in
+                localEffect { localAction in
+                    var globalAction = globalAction
+                    globalAction[keyPath: action] = localAction
+                    callback(globalAction)
+                }
             }
         }
     }

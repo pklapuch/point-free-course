@@ -6,7 +6,7 @@ struct AppState {
     var favoritePrimes: [Int] = []
     var loggedInUser: User? = nil
     var activityFeed: [Activity] = []
-    var alertNthPrime: NthPrimeAlert?
+    var nthPrime: NthPrimeState?
     var isNthPrimeButtonDisable = false
 
     struct Activity {

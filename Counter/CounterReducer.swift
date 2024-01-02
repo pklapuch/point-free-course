@@ -3,16 +3,16 @@ import ComposableArchitecture
 import PrimeModal
 
 public struct CounterState {
-    public var alertNthPrime: NthPrimeAlert?
+    public var nthPrime: NthPrimeState?
     public var count: Int
     public var isNthPrimeButtonDisable: Bool
 
     public init(
-        alertNthPrime: NthPrimeAlert? = nil,
+        nthPrime: NthPrimeState? = nil,
         count: Int,
         isNthPrimeButtonDisable: Bool
     ) {
-        self.alertNthPrime = alertNthPrime
+        self.nthPrime = nthPrime
         self.count = count
         self.isNthPrimeButtonDisable = isNthPrimeButtonDisable
     }
@@ -47,23 +47,21 @@ public enum CounterReducer {
             state.isNthPrimeButtonDisable = true
             let count = state.count
 
-            return [{
+            return [{ callback in
                 getNthPrimeFromRemote(count) { prime in
-                    // TODO:
+                    DispatchQueue.main.async {
+                        callback(.nthPrimeResponse(1999))
+                    }
                 }
-                return .nthPrimeResponse(1999)
             }]
         case let .nthPrimeResponse(prime):
-            state.alertNthPrime = prime.map { 
-                NthPrimeAlert(
-                    prime: state.count,
-                    result: $0
-                )
+            state.nthPrime = prime.map {
+                NthPrimeState(prime: state.count, result: $0)
             }
             state.isNthPrimeButtonDisable = false
             return []
         case .nthPrimeDismissed:
-            state.alertNthPrime = nil
+            state.nthPrime = nil
             return []
         }
     }

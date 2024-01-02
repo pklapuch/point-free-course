@@ -1,7 +1,8 @@
 import SwiftUI
 import Combine
 
-public typealias Effect<Action> = () -> Action?
+public typealias Parallel<Action> = (Action) -> Void
+public typealias Effect<Action> = (@escaping Parallel<Action>) -> Void
 
 public typealias Reducer<Value, Action> = (inout Value, Action) -> [Effect<Action>]
 
@@ -21,8 +22,9 @@ public final class Store<Value, Action>: ObservableObject {
 
     public func send(_ action: Action) {
         reducer(&value, action)
-            .compactMap { $0() }
-            .forEach { send($0) }
+            .forEach { effect in
+                effect(self.send)
+            }
     }
 
     public func view<LocalValue, LocalAction>(

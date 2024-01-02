@@ -25,17 +25,16 @@ public enum FavoritePrimesReducer {
     private static func saveEffect(
         favoritePrimes: [Int]
     ) -> Effect<FavoritePrimesAction> {
-        {
+        { _ in
             FileHelper.save(favoritePrimes)
-            return nil
         }
     }
 
     private static func loadEffect(
     ) -> Effect<FavoritePrimesAction> {
-        {
+        { callback in
             let favoritePrimes = FileHelper.load()
-            return .loadedFavoritePrimes(favoritePrimes)
+            callback(.loadedFavoritePrimes(favoritePrimes))
         }
     }
 }
