@@ -47,7 +47,7 @@ public enum CounterReducer {
             state.isNthPrimeButtonDisable = true
             let count = state.count
 
-            return [{ callback in
+            return [Effect<CounterAction> { callback in
                 getNthPrimeFromRemote(count) { prime in
                     DispatchQueue.main.async {
                         callback(.nthPrimeResponse(1999))
