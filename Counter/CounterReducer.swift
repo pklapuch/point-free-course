@@ -2,8 +2,6 @@ import Foundation
 import ComposableArchitecture
 import PrimeModal
 
-private func noEffect() { }
-
 public enum CounterReducer {
     public static let reducer = combine(
         pullback(
@@ -21,14 +19,14 @@ public enum CounterReducer {
     private static func reduce(
         state: inout Int,
         action: CounterAction
-    ) -> Effect {
+    ) -> [Effect<CounterAction>] {
         switch action {
         case .decrementTapped: 
             state -= 1
-            return noEffect
+            return []
         case .incrementTapped:
             state += 1
-            return noEffect
+            return []
         }
     }
 }

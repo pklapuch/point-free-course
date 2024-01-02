@@ -27,30 +27,10 @@ public struct FavoritePrimesView: View {
     }
 
     private func save() {
-        let data = try! JSONEncoder().encode(store.value)
-        let url = makeFavoritePrimesUrl()
-        try! data.write(to: url)
+        store.send(.saveButtonTapped)
     }
 
     private func load() {
-        let url = makeFavoritePrimesUrl()
-        let data = try! Data(contentsOf: url)
-        let value = try! JSONDecoder().decode([Int].self, from: data)
-        store.send(.loadedFavoritePrimes(value))
-    }
-
-    private func makeFavoritePrimesUrl() -> URL {
-        let documentsPath = NSSearchPathForDirectoriesInDomains(
-            .documentDirectory,
-            .userDomainMask, 
-            true
-        )[0]
-
-        let documentsURL = URL(fileURLWithPath: documentsPath)
-
-        return documentsURL.appendingPathComponent(
-            "favorite-primes.json",
-            conformingTo: .fileURL
-        )
+        store.send(.loadButtonTapped)
     }
 }

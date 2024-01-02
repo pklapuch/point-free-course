@@ -1,9 +1,9 @@
 import SwiftUI
 import Combine
 
-public typealias Effect = () -> Void
+public typealias Effect<Action> = () -> Action?
 
-public typealias Reducer<Value, Action> = (inout Value, Action) -> Effect
+public typealias Reducer<Value, Action> = (inout Value, Action) -> [Effect<Action>]
 
 public final class Store<Value, Action>: ObservableObject {
 
@@ -20,8 +20,9 @@ public final class Store<Value, Action>: ObservableObject {
     }
 
     public func send(_ action: Action) {
-        let effect = reducer(&value, action)
-        effect()
+        reducer(&value, action)
+            .compactMap { $0() }
+            .forEach { send($0) }
     }
 
     public func view<LocalValue, LocalAction>(
@@ -33,7 +34,7 @@ public final class Store<Value, Action>: ObservableObject {
             reducer: { localValue, localAction in
                 self.send(toGlobalAction(localAction))
                 localValue = toLocalValue(self.value)
-                return { }
+                return []
             }
         )
 

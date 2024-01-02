@@ -5,16 +5,16 @@ public enum LoggingReducer {
         _ reducer: @escaping Reducer<Value, Action>
     ) -> Reducer<Value, Action> {
         return { value, action in
-            let effect = reducer(&value, action)
+            let effects = reducer(&value, action)
             let newValue = value
-            
-            return {
+
+            return [{
                 print("Action: \(action)")
                 print("Value:")
                 dump(newValue)
                 print("--")
-                effect()
-            }
+                return nil
+            }] + effects
         }
     }
 }

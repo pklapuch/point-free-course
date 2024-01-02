@@ -8,8 +8,8 @@ enum AppStateReducerComposer {
     static func reduce(
         state: inout AppState,
         action: AppAction
-    ) -> Effect {
-        let appReducer: (inout AppState, AppAction) -> Effect = combine(
+    ) -> [Effect<AppAction>] {
+        let appReducer: (inout AppState, AppAction) -> [Effect<AppAction>] = combine(
             pullback(
                 CounterReducer.reducer,
                 value: \.counterView,

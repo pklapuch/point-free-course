@@ -11,61 +11,85 @@ enum ActivityFeedReducer {
         _ reducer: @escaping Reducer<AppState, AppAction>
     ) -> Reducer<AppState, AppAction> {
         return { value, action in
-            var effect: Effect
+            var counterEffects: [Effect<CounterViewAction>] = []
+            var favoritePrimesEffects: [Effect<FavoritePrimesAction>] = []
+
             switch action {
             case let .counterView(action):
-                effect = reduce(value: &value, action: action)
+                counterEffects = reduce(value: &value, action: action)
             case let .favoritePrimes(action):
-                effect = reduce(value: &value, action: action)
+                favoritePrimesEffects = reduce(value: &value, action: action)
             }
 
-            let anotherEffect = reducer(&value, action)
+            var allEffects = [Effect<AppAction>]()
 
-            return {
-                effect()
-                anotherEffect()
-            }
+            allEffects.append(contentsOf: counterEffects.map { counterEffect in
+                { () -> AppAction? in
+                    guard let counterAction = counterEffect() else { return nil }
+                    return .counterView(counterAction)
+                }
+            })
+
+            allEffects.append(contentsOf: favoritePrimesEffects.map { primeEffect in
+                { () -> AppAction? in
+                    guard let primeAction = primeEffect() else { return nil }
+                    return .favoritePrimes(primeAction)
+                }
+            })
+
+            let underlyingEffects = reducer(&value, action)
+            allEffects.append(contentsOf: underlyingEffects)
+
+            return allEffects
         }
     }
 
     private static func reduce(
         value: inout AppState,
         action: CounterViewAction
-    ) -> Effect {
+    ) -> [Effect<CounterViewAction>] {
         switch action {
         case .counter:
-            return noEffect
+            return []
         case let .primeModal(action):
-            return reduce(value: &value, action: action)
+            let primeModalEffects = reduce(value: &value, action: action)
+            return primeModalEffects.map { primeModelEffect in
+                { () -> CounterViewAction? in
+                    guard let primeModalAction = primeModelEffect() else { return nil }
+                    return .primeModal(primeModalAction)
+                }
+            }
         }
     }
 
     private static func reduce(
         value: inout AppState,
         action: FavoritePrimesAction
-    ) -> Effect {
+    ) -> [Effect<FavoritePrimesAction>] {
         switch action {
         case let .removeFavoritePrimes(indexSet):
             removeFavoritePrimes(value: &value, indexSet: indexSet)
-            return noEffect
+            return []
         case .loadedFavoritePrimes:
-            return noEffect
+            return []
         case .saveButtonTapped:
-            return noEffect
+            return []
+        case .loadButtonTapped:
+            return []
         }
     }
 
     private static func reduce(
         value: inout AppState,
         action: PrimeModalAction
-    ) -> Effect {
+    ) -> [Effect<PrimeModalAction>] {
         switch action {
         case .saveFavoritePrimeTapped:
             saveFavoritePrime(value: &value)
-            return noEffect
+            return []
         case .removeFavoritePrimeTapped:
             removeFavoritePrime(value: &value)
-            return noEffect
+            return []
         }
     }
 

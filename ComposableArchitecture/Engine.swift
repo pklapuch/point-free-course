@@ -1,7 +1,5 @@
 import Foundation
 
-private func noEffect() { }
-
 public func pullback<LocalValue, GlobalValue, LocalAction, GlobalAction>(
     _ reducer: @escaping Reducer<LocalValue, LocalAction>,
     value: WritableKeyPath<GlobalValue, LocalValue>,
@@ -9,11 +7,20 @@ public func pullback<LocalValue, GlobalValue, LocalAction, GlobalAction>(
 ) -> Reducer<GlobalValue, GlobalAction> {
     return { globalValue, globalAction in
         guard let localAction = globalAction[keyPath: action] else {
-            return noEffect
+            return []
         }
 
-        let effect = reducer(&globalValue[keyPath: value], localAction)
-        return effect
+        let localEffects = reducer(&globalValue[keyPath: value], localAction)
+
+        return localEffects.map { localEffect in
+            { () -> GlobalAction? in
+                guard let localAction = localEffect() else { return nil }
+
+                var globalAction = globalAction
+                globalAction[keyPath: action] = localAction
+                return globalAction
+            }
+        }
     }
 }
 
@@ -21,11 +28,8 @@ public func combine<Value, Action>(
     _ reducers: Reducer<Value, Action>...
 ) -> Reducer<Value, Action> {
     return { value, action in
-        let effects = reducers.map { $0(&value, action) }
-        
-        return {
-            for effect in effects { effect() }
-        }
+        let effects = reducers.flatMap { $0(&value, action) }
+        return effects
     }
 }
 
