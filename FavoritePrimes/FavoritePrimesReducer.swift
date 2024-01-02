@@ -1,19 +1,27 @@
 import Foundation
+import ComposableArchitecture
+
+private func noEffect() { }
 
 public enum FavoritePrimesReducer {
     public static func reduce(
         state: inout [Int],
         action: FavoritePrimesAction
-    ) {
+    ) -> Effect {
         switch action {
         case let .removeFavoritePrimes(indexSet):
             for index in indexSet {
                 state.remove(at: index)
             }
+            return noEffect
         case let .loadedFavoritePrimes(primes):
             state = primes
+            return noEffect
         case .saveButtonTapped:
-            save(state)
+            let state = state
+            return {
+                save(state)
+            }
         }
     }
     

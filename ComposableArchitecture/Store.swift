@@ -1,7 +1,9 @@
 import SwiftUI
 import Combine
 
-public typealias Reducer<Value, Action> = (inout Value, Action) -> Void
+public typealias Effect = () -> Void
+
+public typealias Reducer<Value, Action> = (inout Value, Action) -> Effect
 
 public final class Store<Value, Action>: ObservableObject {
 
@@ -18,7 +20,8 @@ public final class Store<Value, Action>: ObservableObject {
     }
 
     public func send(_ action: Action) {
-        reducer(&value, action)
+        let effect = reducer(&value, action)
+        effect()
     }
 
     public func view<LocalValue, LocalAction>(
@@ -30,6 +33,7 @@ public final class Store<Value, Action>: ObservableObject {
             reducer: { localValue, localAction in
                 self.send(toGlobalAction(localAction))
                 localValue = toLocalValue(self.value)
+                return { }
             }
         )
 

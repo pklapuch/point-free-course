@@ -1,13 +1,19 @@
 import Foundation
 
+private func noEffect() { }
+
 public func pullback<LocalValue, GlobalValue, LocalAction, GlobalAction>(
     _ reducer: @escaping Reducer<LocalValue, LocalAction>,
     value: WritableKeyPath<GlobalValue, LocalValue>,
     action: WritableKeyPath<GlobalAction, LocalAction?>
 ) -> Reducer<GlobalValue, GlobalAction> {
     return { globalValue, globalAction in
-        guard let localAction = globalAction[keyPath: action] else { return }
-        reducer(&globalValue[keyPath: value], localAction)
+        guard let localAction = globalAction[keyPath: action] else {
+            return noEffect
+        }
+
+        let effect = reducer(&globalValue[keyPath: value], localAction)
+        return effect
     }
 }
 
@@ -15,7 +21,11 @@ public func combine<Value, Action>(
     _ reducers: Reducer<Value, Action>...
 ) -> Reducer<Value, Action> {
     return { value, action in
-        reducers.forEach { $0(&value, action) }
+        let effects = reducers.map { $0(&value, action) }
+        
+        return {
+            for effect in effects { effect() }
+        }
     }
 }
 
@@ -31,6 +41,6 @@ public func compose<Value, Action>(
             decorated = decorator(decorated)
         }
 
-        decorated(&value, action)
+        return decorated(&value, action)
     }
 }
