@@ -8,14 +8,13 @@ enum AppStateReducerComposer {
     static func reduce(
         state: inout AppState,
         action: AppAction
-    ) {
-        let appReducer: (inout AppState, AppAction) -> Void = combine(
+    ) -> Effect {
+        let appReducer: (inout AppState, AppAction) -> Effect = combine(
             pullback(
                 CounterReducer.reducer,
                 value: \.counterView,
                 action: \.counterView
             ),
-
             pullback(
                 FavoritePrimesReducer.reduce,
                 value: \.favoritePrimes,
@@ -23,7 +22,7 @@ enum AppStateReducerComposer {
             )
         )
 
-        compose(reducer: appReducer, with:
+        return compose(reducer: appReducer, with:
             LoggingReducer.reduce,
             ActivityFeedReducer.reduce
         )(&state, action)

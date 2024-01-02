@@ -2,47 +2,70 @@ import Foundation
 import PrimeModal
 import Counter
 import FavoritePrimes
+import ComposableArchitecture
+
+private func noEffect() { }
 
 enum ActivityFeedReducer {
     static func reduce(
-        _ reducer: @escaping (inout AppState, AppAction) -> Void
-    ) -> (inout AppState, AppAction) -> Void {
+        _ reducer: @escaping Reducer<AppState, AppAction>
+    ) -> Reducer<AppState, AppAction> {
         return { value, action in
+            var effect: Effect
             switch action {
             case let .counterView(action):
-                reduce(value: &value, action: action)
+                effect = reduce(value: &value, action: action)
             case let .favoritePrimes(action):
-                reduce(value: &value, action: action)
+                effect = reduce(value: &value, action: action)
             }
 
-            reducer(&value, action)
+            let anotherEffect = reducer(&value, action)
+
+            return {
+                effect()
+                anotherEffect()
+            }
         }
     }
 
-    private static func reduce(value: inout AppState, action: CounterViewAction) {
+    private static func reduce(
+        value: inout AppState,
+        action: CounterViewAction
+    ) -> Effect {
         switch action {
         case .counter:
-            break
+            return noEffect
         case let .primeModal(action):
-            reduce(value: &value, action: action)
+            return reduce(value: &value, action: action)
         }
     }
 
-    private static func reduce(value: inout AppState, action: FavoritePrimesAction) {
+    private static func reduce(
+        value: inout AppState,
+        action: FavoritePrimesAction
+    ) -> Effect {
         switch action {
         case let .removeFavoritePrimes(indexSet):
             removeFavoritePrimes(value: &value, indexSet: indexSet)
-        case .loadedFavoritePrimes: ()
-        case .saveButtonTapped: ()
+            return noEffect
+        case .loadedFavoritePrimes:
+            return noEffect
+        case .saveButtonTapped:
+            return noEffect
         }
     }
 
-    private static func reduce(value: inout AppState, action: PrimeModalAction) {
+    private static func reduce(
+        value: inout AppState,
+        action: PrimeModalAction
+    ) -> Effect {
         switch action {
         case .saveFavoritePrimeTapped:
             saveFavoritePrime(value: &value)
+            return noEffect
         case .removeFavoritePrimeTapped:
             removeFavoritePrime(value: &value)
+            return noEffect
         }
     }
 
